@@ -13,7 +13,7 @@ class DataPreprocessing:
         self.cleaning()
         self.setTarget()
         self.normalize()
-        self.saveToFile()
+        # self.saveToFile()
         return self.x_preprocessed, self.y_preprocessed
 
     def cleaning(self):

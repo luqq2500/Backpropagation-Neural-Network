@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 from model.activation import sigmoid, sigmoid_derivative
 from model.loss_function import binaryCrossEntropyLoss
 
@@ -67,19 +65,11 @@ class BackPropagationNeuralNetwork:
         a2 = self.activation(np.dot(a1, self.W2) + self.b2)
         return (a2>threshold).astype(int)
 
-    def test(self, x_test, y_test, threshold):
-        result = self.predict(x_test, threshold)
-        self.accuracy = np.mean(result == y_test)
-        print("Accuracy:", accuracy_score(y_test, result))
-        print("Precision:", precision_score(y_test, result))
-        print("Recall:", recall_score(y_test, result))
-        print("F1 Score:", f1_score(y_test, result))
-        print("Confusion Matrix:\n", confusion_matrix(y_test, result))
-        print("Classification Report:\n", classification_report(y_test, result))
-        return self
-
     def build(self):
-        return self.W1, self.b1, self.W2, self.b2, self.losses, self.accuracy
+        return self.W1, self.b1, self.W2, self.b2, self.losses
+
+    def reset(self):
+        self.__init__()
 
     def configureFunction(self, activation, loss):
         self.activation = activation
