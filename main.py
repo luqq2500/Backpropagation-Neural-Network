@@ -1,9 +1,13 @@
+from data.processing import processing
 from model.develop import ModelDeveloper
 from model.loss_function import binaryCrossEntropyLoss
 from model.activation import sigmoid
 from model.bpnn import BackPropagationNeuralNetwork
-from data.processing import x_train, y_train, x_test, y_test
 
+# DATA PROCESSING AND PARTITIONING
+file_path = 'data/source/credit_card_eligibility.csv'
+TEST_SIZE = 0.4
+x_train, y_train, x_test, y_test = processing(file_path, TEST_SIZE)
 INPUT_SIZE  = x_train.shape[1]
 OUTPUT_SIZE = 1
 
@@ -14,10 +18,10 @@ BATCH_SIZE = [1500] # Number of rows trained per batch
 EPOCHS = [50] # Epochs models update the weights.
 THRESHOLD = [0.7] # Prediction threshold.
 
+# INITIALIZE MODELER
 model = BackPropagationNeuralNetwork()
 activation = sigmoid
 loss = binaryCrossEntropyLoss
-
 developer = ModelDeveloper(
     model=model,
     activation=activation,
@@ -30,4 +34,5 @@ developer = ModelDeveloper(
     batch_size=BATCH_SIZE,
     threshold=THRESHOLD)
 
+# RUN MODELER
 developer.run(x_train, y_train, x_test, y_test)
