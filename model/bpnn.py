@@ -48,13 +48,8 @@ class BackPropagationNeuralNetwork:
     def backPropagate(self, y_true, y_pred):
         """Perform backpropagation and update weights and biases"""
         m = y_true.shape[0]
-        # initialize gradient lists
-        grad_w = [np.zeros_like(W) for W in self.weights]
-        grad_b = [np.zeros_like(b) for b in self.biases]
-
-        # delta for output layer
+        grad_b, grad_w = self.initializeGradient()
         delta = (y_pred - y_true)
-        print(f'Delta: {delta}')# for BCE with sigmoid
         # backprop through layers
         for l in reversed(range(len(self.weights))):
             a_prev = self.activations[l]
@@ -64,8 +59,15 @@ class BackPropagationNeuralNetwork:
             if l > 0:
                 z_prev = self.zs[l-1]
                 delta = np.dot(delta, self.weights[l].T) * self.activation_deriv(z_prev)
+        self.updateWeightsAndBiases(grad_w, grad_b)
 
-        # update parameters
+    def initializeGradient(self):
+        # initialize gradient lists
+        grad_w = [np.zeros_like(W) for W in self.weights]
+        grad_b = [np.zeros_like(b) for b in self.biases]
+        return grad_b, grad_w
+
+    def updateWeightsAndBiases(self, grad_w, grad_b):
         for i in range(len(self.weights)):
             self.weights[i] -= self.learning_rate * grad_w[i]
             self.biases[i] -= self.learning_rate * grad_b[i]

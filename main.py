@@ -4,12 +4,12 @@ from model.loss_function import binaryCrossEntropyLoss
 from model.activation import sigmoid, sigmoid_derivative
 from model.bpnn import BackPropagationNeuralNetwork
 
-# Hyperparameter Variations
-TEST_SIZE = [0.4, 0.3]               # Test size of data.
-HIDDEN_SIZE = [[8],[4,8]]     # List of number of hidden layer neurons.
-LEARNING_RATE = [0.01, 0.1]           # List of learning rate to adjust weight updates.
-BATCH_SIZE = [2000, 4000]              # List of number of rows trained per batch
-EPOCHS = [50, 100]                   # List of epochs models update the weights.
+# Hyperparameter - Variations Format: [variation, variation, ...]
+TEST_SIZE = [0.3]              # Test size of data.
+HIDDEN_SIZE = [[8],[4,8]]           # Number of hidden layer neurons.
+LEARNING_RATE = [0.1, 0.01]         # List of learning rate to adjust weight updates.
+BATCH_SIZE = [1000, 2000]           # List of number of rows trained per batch
+EPOCHS = [50]                  # List of epochs models update the weights.
 
 processor = dataProcessorDependencies()
 model = BackPropagationNeuralNetwork()

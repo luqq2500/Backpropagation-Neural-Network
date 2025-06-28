@@ -1,8 +1,8 @@
 from itertools import product
 from matplotlib import pyplot as plt
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
+from model.performance import measurePerformanceMetrics
 
-
+# Modeler class responsible for modeling variations of parameter, for experimentation.
 class Modeler:
     def __init__(self, data_processor, test_size, model, activation, activation_deriv, loss, hidden_size, learning_rate, epochs, batch_size):
         self.data_processor = data_processor
@@ -18,20 +18,17 @@ class Modeler:
         self.epochs = epochs
         self.batch_size = batch_size
         self.threshold = 0.5
+        self.params = []
         self.y_test_history = []
         self.weight_history = []
         self.biases_history = []
         self.loss_history = []
         self.prediction_history = []
 
-    def processData(self, test_size):
-        x_train, y_train, x_test, y_test =  self.data_processor.run(test_size=test_size)
-        self.input_size = len(x_train[0])
-        return x_train, y_train, x_test, y_test
-
+    # Loop through each parameter combination to model, test, and measure loss.
     def run(self):
-        params = self.createParamsMatrix()
-        for i, param in enumerate(params):
+        self.createParameterCombinationMatrix()
+        for i, param in enumerate(self.params):
             test_size = param['test_size']
             hidden_size = param['hidden']
             print(hidden_size)
@@ -56,27 +53,41 @@ class Modeler:
             self.loss_history.append(losses)
             self.y_test_history.append(y_test)
             self.model.reset()
-        self.plotResults(params)
+        self.plotResults()
+        return self.params, self.loss_history,
 
-    def plotResults(self, params):
+    # Process data with test size variations.
+    def processData(self, test_size):
+        x_train, y_train, x_test, y_test =  self.data_processor.run(test_size=test_size)
+        self.input_size = len(x_train[0])
+        return x_train, y_train, x_test, y_test
+
+    # Create iterable parameter combinations.
+    def createParameterCombinationMatrix(self):
+        for test_size, hidden, lr, epoch, bs in product(self.test_size, self.hidden_size, self.learning_rate, self.epochs, self.batch_size):
+            parameter = {
+                'test_size': test_size,
+                'hidden': hidden,
+                'lr': lr,
+                'epoch': epoch,
+                'bs': bs
+            }
+            self.params.append(parameter)
+
+    # Plot each model variation's parameters and performances.
+    def plotResults(self):
         fig, ax = plt.subplots(figsize=(12, 7))
-        for i, param in enumerate(params):
-            test_size = param['test_size']
-            hidden = param['hidden']
-            lr = param['lr']
-            epoch = param['epoch']
-            batch_size = param['bs']
+        for i, param in enumerate(self.params):
             losses = self.loss_history[i]
             y_predict = self.prediction_history[i]
-            print(f'Y predict: {y_predict}')
             y_test = self.y_test_history[i]
-            print(f'Y test: {y_test}')
-
+            accuracy, precision, recall, f1, roc_auc = measurePerformanceMetrics(y_test, y_predict)
             label = (
-                f"Hidden: {hidden}, LR: {lr}, Epochs: {epoch}, Batch: {batch_size}, "
-                f"Acc: {accuracy_score(y_test, y_predict):.3f}, "
-                f"Precision: {precision_score(y_test, y_predict):.3f}, Recall: {recall_score(y_test, y_predict):.3f}"
-                f"F1: {f1_score(y_test, y_predict):.3f}, ROC AUC: {roc_auc_score(y_test, y_predict):.3f}"
+                f"Hidden: {param['hidden']}, LR: {param['lr']}, Epochs: {param['epoch']}, "
+                f"Batch: {param['bs']}, Test Size: {param['test_size']}, "
+                f"Acc: {accuracy:.3f}, "
+                f"Precision: {precision:.3f}, Recall: {recall:.3f}"
+                f"F1: {f1:.3f}, ROC AUC: {roc_auc:.3f}"
             )
             ax.plot(losses, label=label)
         ax.set_xlabel("Batch Updates")
@@ -87,16 +98,4 @@ class Modeler:
         plt.tight_layout()
         plt.show()
 
-    def createParamsMatrix(self):
-        params = []
-        for test_size, hidden, lr, epoch, bs in product(self.test_size, self.hidden_size, self.learning_rate, self.epochs, self.batch_size):
-            param = {
-                'test_size': test_size,
-                'hidden': hidden,
-                'lr': lr,
-                'epoch': epoch,
-                'bs': bs
-            }
-            params.append(param)
-        return params
 
