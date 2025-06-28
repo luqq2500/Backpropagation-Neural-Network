@@ -54,7 +54,7 @@ class Modeler:
             self.y_test_history.append(y_test)
             self.model.reset()
         self.plotResults()
-        return self.params, self.loss_history,
+        return self.params, self.loss_history
 
     # Process data with test size variations.
     def processData(self, test_size):

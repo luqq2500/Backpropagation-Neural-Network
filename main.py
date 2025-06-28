@@ -8,7 +8,7 @@ from model.bpnn import BackPropagationNeuralNetwork
 TEST_SIZE = [0.3]              # Test size of data.
 HIDDEN_SIZE = [[8],[4,8]]           # Number of hidden layer neurons.
 LEARNING_RATE = [0.1, 0.01]         # List of learning rate to adjust weight updates.
-BATCH_SIZE = [1000, 2000]           # List of number of rows trained per batch
+BATCH_SIZE = [2000, 4000]           # List of number of rows trained per batch
 EPOCHS = [50]                  # List of epochs models update the weights.
 
 processor = dataProcessorDependencies()
@@ -29,4 +29,9 @@ modeler = Modeler(
     batch_size=BATCH_SIZE)
 
 # Run modeler
-modeler.run()
+parameters, losses = modeler.run()
+
+# Display parameter and its loss
+for param, loss in zip(parameters,losses):
+    print(f'Parameter: {param}')
+    print(f'Losses: {loss}')
