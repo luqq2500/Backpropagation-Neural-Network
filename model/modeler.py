@@ -19,11 +19,12 @@ class Modeler:
         self.batch_size = batch_size
         self.threshold = 0.5
         self.params = []
-        self.y_test_history = []
         self.weight_history = []
         self.biases_history = []
         self.loss_history = []
-        self.prediction_history = []
+        self.y_test_history = []
+        self.y_predict_history = []
+        self.accuracy_history = []
 
     # Loop through each parameter combination to model, test, and measure loss.
     def run(self):
@@ -45,16 +46,18 @@ class Modeler:
                 .fit(x_train, y_train)
                 .getParameters()))
 
-            prediction = self.model.predict(x_test, self.threshold)
+            y_predict = self.model.predict(x_test, self.threshold)
+            accuracy = measurePerformanceMetrics(y_test, y_predict)
 
-            self.prediction_history.append(prediction)
             self.weight_history.append(weight)
             self.biases_history.append(biases)
             self.loss_history.append(losses)
+            self.y_predict_history.append(y_predict)
             self.y_test_history.append(y_test)
+            self.accuracy_history.append(round(accuracy, 3))
             self.model.reset()
         self.plotResults()
-        return self.params, self.loss_history
+        return self.params, self.loss_history, self.accuracy_history
 
     # Process data with test size variations.
     def processData(self, test_size):
@@ -79,22 +82,23 @@ class Modeler:
         fig, ax = plt.subplots(figsize=(12, 7))
         for i, param in enumerate(self.params):
             losses = self.loss_history[i]
-            y_predict = self.prediction_history[i]
-            y_test = self.y_test_history[i]
-            accuracy, precision, recall, f1, roc_auc = measurePerformanceMetrics(y_test, y_predict)
+            accuracy = self.accuracy_history[i]
+            # y_predict = self.y_predict_history[i]
+            # y_test = self.y_test_history[i]
+            # accuracy = measurePerformanceMetrics(y_test, y_predict)
             label = (
-                f"Hidden: {param['hidden']}, LR: {param['lr']}, Epochs: {param['epoch']}, "
-                f"Batch: {param['bs']}, Test Size: {param['test_size']}, "
-                f"Acc: {accuracy:.3f}, "
-                f"Precision: {precision:.3f}, Recall: {recall:.3f}"
-                f"F1: {f1:.3f}, ROC AUC: {roc_auc:.3f}"
+                f"Hidden: {param['hidden']}, LR: {param['lr']}, "
+                f"Epochs: {param['epoch']}, Batch: {param['bs']}, "
+                f"Test Size: {param['test_size']}, Acc: {accuracy:.3f}, "
+                # f"Precision: {precision:.3f}, Recall: {recall:.3f}"
+                # f"F1: {f1:.3f}, ROC AUC: {roc_auc:.3f}"
             )
             ax.plot(losses, label=label)
         ax.set_xlabel("Batch Updates")
         ax.set_ylabel("Loss")
         ax.set_title("Training Loss Curves for Multiple Hyperparameters", fontsize=14)
         ax.grid(True)
-        ax.legend(loc='upper right', fontsize='small')
+        ax.legend(loc='upper right', fontsize='medium')
         plt.tight_layout()
         plt.show()
 

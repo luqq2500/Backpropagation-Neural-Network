@@ -6,9 +6,9 @@ from model.bpnn import BackPropagationNeuralNetwork
 
 # Hyperparameter - Variations Format: [variation, variation, ...]
 TEST_SIZE = [0.3]              # Test size of data.
-HIDDEN_SIZE = [[8],[4,8]]           # Number of hidden layer neurons.
-LEARNING_RATE = [0.1, 0.01]         # List of learning rate to adjust weight updates.
-BATCH_SIZE = [2000, 4000]           # List of number of rows trained per batch
+HIDDEN_SIZE = [[8]]           # Number of hidden layer neurons.
+LEARNING_RATE = [0.1, 0.001]         # List of learning rate to adjust weight updates.
+BATCH_SIZE = [2000]           # List of number of rows trained per batch
 EPOCHS = [50]                  # List of epochs models update the weights.
 
 processor = dataProcessorDependencies()
@@ -29,9 +29,12 @@ modeler = Modeler(
     batch_size=BATCH_SIZE)
 
 # Run modeler
-parameters, losses = modeler.run()
+parameters, losses_history, accuracy_history = modeler.run()
 
 # Display parameter and its loss
-for param, loss in zip(parameters,losses):
+print(f'\n======== HYPERPARAMETER TUNING RESULT ========\n')
+for i, (param, losses, accuracy) in enumerate(zip(parameters, losses_history, accuracy_history)):
+    print(f'Experiment: {i+1}')
     print(f'Parameter: {param}')
-    print(f'Losses: {loss}')
+    print(f'Losses: {losses}')
+    print(f'Accuracy: {accuracy}\n')
