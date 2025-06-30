@@ -10,7 +10,7 @@ def dataProcessorDependencies():
     splitter = train_test_split
     preprocessor = Preprocessor()
     partitioner = Partitioner(splitter)
-    smote = SMOTE()
+    smote = SMOTE(sampling_strategy=1.0, k_neighbors=5)
     resampler = Resampler(smote)
     processor = Processor(file_path, preprocessor, partitioner, resampler)
     return processor
